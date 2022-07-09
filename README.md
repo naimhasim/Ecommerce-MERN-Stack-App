@@ -1,3 +1,3 @@
-# 
+# Cermat Ecommerce MERN Stack App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A small ecommerce MERN Stack app made for practice & learning.

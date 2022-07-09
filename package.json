@@ -1,0 +1,22 @@
+{
+  "name": "cermat-ecommerce-app",
+  "version": "1.0.0",
+  "description": "A small ecommerce MERN Stack app made for practice & learning.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"cd cermat-backend && npm run dev\" \"cd cermat-frontend && npm start\" "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naimhasim/Ecommerce-MERN-Stack-App.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/naimhasim/Ecommerce-MERN-Stack-App/issues"
+  },
+  "homepage": "https://github.com/naimhasim/Ecommerce-MERN-Stack-App#readme",
+  "devDependencies": {
+    "concurrently": "^7.2.2"
+  }
+}

@@ -1,3 +1,6 @@
+const connectDB = require('./db');
+
 module.exports = {
-  port: 3000,
-}
+  port: process.env.PORT || 8081,
+  connectDB,
+};

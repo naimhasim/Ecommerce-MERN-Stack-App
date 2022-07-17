@@ -1,39 +1,28 @@
-// loading .ENV
-const dotenv = require('dotenv');
-const dotenvExpand = require('dotenv-expand');
-const myEnv = dotenv.config();
-dotenvExpand.expand(myEnv);
+require('dotenv-expand').expand(require('dotenv').config());
 
-// import dependencies
 const express = require('express');
+
 const bodyParser = require('body-parser');
-const { port, connectDB } = require('./config/config');
-
-// import router
-const { customer } = require('./routes/index');
-
-// import model
-const { customerSchema } = require('./feature/customers/customer.model');
-const { productSchema } = require('./feature/products/product.model');
-
+const useDatabate = require('./config/db');
+const { port } = require('./config/config');
+const createRouter = require('./routes/api/index');
 const app = express();
 
 // middleware
 app.use(bodyParser.json()); // support parsing of application/json type post data
 app.use(bodyParser.urlencoded({ extended: true })); //support parsing of application/x-www-form-urlencoded post data
 
-// Connect Database
-const db = connectDB();
+console.log('Connecting database...');
 
-productModel = db.model('product', productSchema);
+useDatabate().then((db) => {
+  console.log('MongoDB database connection established successfully!');
 
-productModel.find({}, (err, result) => {
-  if (err) throw err;
-  console.log(result, result.length);
+  app.use('/api/customer', createRouter.customer);
+  app.use('/api/product', createRouter.product);
+  app.use('/api', (req, res) => res.json({ message: `${router.product}` }));
+  app.use('*', (req, res) =>
+    res.status(404).json({ error: '404 Not Found!', redirect: 'http://localhost:8080/api/' })
+  );
+
+  app.listen(port, () => console.log(`Server running on http://localhost:${port}/api/`));
 });
-
-// route
-app.get('/api', (req, res) => res.send('hello world'));
-app.use('/api/customer', customer);
-
-app.listen(port, () => console.log(`Server running on http://localhost:${port}/api/`));

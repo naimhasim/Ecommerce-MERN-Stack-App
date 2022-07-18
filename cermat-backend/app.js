@@ -17,7 +17,7 @@ console.log('Connecting database...');
 useDatabate().then((db) => {
   console.log('MongoDB database connection established successfully!');
 
-  app.use('/api/customer', createRouter.customer);
+  app.use('/api/customers', createRouter.customer);
   app.use('/api/product', createRouter.product);
   app.use('/api', (req, res) => res.json({ message: `${router.product}` }));
   app.use('*', (req, res) =>

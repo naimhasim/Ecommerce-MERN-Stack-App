@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const model = mongoose.model('product', productSchema);
 
 findProductByName = (req, res) => {
-  model.find(req.params, (err, data) => {
+  model.find({ name: req.params.name }, (err, data) => {
     if (err) throw err;
     // res.json({ data });
     res.json({ ...{ data: data }, ...{ success: true } });
@@ -14,7 +14,7 @@ findProductByName = (req, res) => {
 getAllProduct = (req, res) => {
   model.find({}, (err, data) => {
     if (err) throw err;
-    res.json({ naim: 'ad' });
+    res.json({ ...{ data: data }, ...{ success: true } });
   });
 };
 

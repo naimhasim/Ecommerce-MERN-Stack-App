@@ -25,35 +25,43 @@ const getCustomerByPk = (req, res) => {
 };
 
 const updateCustomerDetailByPk = (req, res) => {
-  oldData = req.body.oldData;
-  newData = req.body.newData;
-
-  const updateData = {
-    fname: newData.fname || oldData.fname,
-    lname: newData.lname || oldData.lname,
-    hashedPassword: newData.hashedPassword || oldData.hashedPassword,
-    emailVerified: newData.emailVerified || oldData.emailVerified,
-  };
-
   customerId = req.params.customerId;
-
   model
-    .findByIdAndUpdate(customerId, updateData)
-    .then((data) => {
-      if (!data) {
-        res.json({
-          message: `Customer data  '${oldData.lname}' failed to updated!`,
-          success: true,
-        });
+    .findById(customerId)
+    .then((oldData) => {
+      if (!oldData) {
+        res.json({ message: 'Customer data not found. Abort update...', success: false });
       } else {
-        res.json({
-          message: `Customer data '${oldData.lname}' sucessfully updated!`,
-          success: true,
-        });
+        newData = req.body.newData;
+        const updateData = {
+          fname: newData.fname || oldData.fname,
+          lname: newData.lname || oldData.lname,
+          hashedPassword: newData.hashedPassword || oldData.hashedPassword,
+          emailVerified: newData.emailVerified || oldData.emailVerified,
+        };
+
+        model
+          .findByIdAndUpdate(customerId, updateData)
+          .then((data) => {
+            if (!data) {
+              res.json({
+                message: `Customer data  '${oldData.lname}' failed to updated!`,
+                success: true,
+              });
+            } else {
+              res.json({
+                message: `Customer data '${oldData.lname}' sucessfully updated!`,
+                success: true,
+              });
+            }
+          })
+          .catch((e) => {
+            res.json({ message: `e` });
+          });
       }
     })
-    .catch((err) => {
-      if (err) throw err;
+    .catch((e) => {
+      res.json({ message: `${e}` });
     });
 };
 

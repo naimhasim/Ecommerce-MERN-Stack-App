@@ -1,33 +1,42 @@
-const { customerSchema } = require('./customer.model');
-
-const mongoose = require('mongoose');
+const { Customer } = require('./customer.model');
 const { ObjectId } = require('mongodb');
-const model = mongoose.model('customer', customerSchema);
 
 const getAllCustomers = (req, res) => {
-  model.find({}, (err, data) => {
+  Customer.find({}, (err, data) => {
     if (err) throw err;
     res.json({ ...{ data: data }, ...{ success: true } });
   });
 };
 
-const getCustomerByPk = (req, res) => {
-  model
-    .findOne(ObjectId(req.params.customerId))
+const getCustomerDetailByPk = (req, res) => {
+  const customerId = req.params.customerId;
+  Customer.findById(customerId)
     .then((data) => {
       if (!data) {
         res.json({ message: 'Data not found!', success: true });
-      } else res.json({ ...{ data: data }, ...{ success: true } });
+      } else {
+        res.json({ ...{ data: data }, ...{ success: true } });
+      }
     })
     .catch((err) => {
       if (err) throw err;
     });
 };
 
+const getCustomerAddressByPk = (req, res) => {
+  Customer.findById(ObjectId(req.params.customerId))
+    .select('address')
+    .then((data) => {
+      if (!data) {
+        res.json({ message: 'No address found.', success: true });
+      }
+      res.json({ ...{ data }, ...{ success: true } });
+    });
+};
+
 const updateCustomerDetailByPk = (req, res) => {
   customerId = req.params.customerId;
-  model
-    .findById(customerId)
+  Customer.findById(customerId)
     .then((oldData) => {
       if (!oldData) {
         res.json({ message: 'Customer data not found. Abort update...', success: false });
@@ -40,8 +49,7 @@ const updateCustomerDetailByPk = (req, res) => {
           emailVerified: newData.emailVerified || oldData.emailVerified,
         };
 
-        model
-          .findByIdAndUpdate(customerId, updateData)
+        Customer.findByIdAndUpdate(customerId, updateData)
           .then((data) => {
             if (!data) {
               res.json({
@@ -65,6 +73,58 @@ const updateCustomerDetailByPk = (req, res) => {
     });
 };
 
+const updateCustomerAddressByPk = (req, res) => {
+  customerId = req.params.customerId;
+  temp = req.body.address;
+
+  Customer.findOneAndUpdate(
+    { 'address.street1': temp.street1 },
+    { 'address.$.street2': temp.street2, 'address.$.city': temp.city }
+  )
+    .select('address')
+    .then((data) => {
+      !data
+        ? res.json({
+            message: `Address failed to updated!`,
+            success: true,
+            data,
+          })
+        : res.json({
+            message: `Address sucessfully updated!`,
+            success: true,
+            data,
+          });
+    })
+    .catch((e) => {
+      res.json({ message: `${e}`, success: false });
+    });
+};
+
+const addCustomerAddressByPk = (req, res) => {
+  Customer.findByIdAndUpdate(req.params.customerId, {
+    $push: {
+      address: {
+        country: req.body.address.country,
+        street1: req.body.address.street1,
+        street2: req.body.address.street2,
+        city: req.body.address.city,
+        state: req.body.address.state,
+        zip: req.body.address.zip,
+      },
+    },
+  })
+    .then((data) => {
+      if (!data) {
+        res.json({ message: 'Address not created.', success: true });
+      } else {
+        res.json({ message: data, success: true });
+      }
+    })
+    .catch((e) => {
+      res.json({ message: `${e}`, success: false });
+    });
+};
+
 const addCustomer = (req, res) => {
   addressArray = [];
 
@@ -79,9 +139,9 @@ const addCustomer = (req, res) => {
     });
   });
 
-  // reference: https://mongoosejs.com/docs/models.html#constructing-documents
+  // reference: https://mongoosejs.com/docs/Customers.html#constructing-documents
 
-  const customer = new model({
+  const customer = new Customer({
     fname: req.body.fname,
     lname: req.body.lname,
     hashedPassword: req.body.hashedPassword,
@@ -103,8 +163,8 @@ const addCustomer = (req, res) => {
   });
 };
 
-const deleteCustomerByPK = (req, res) => {
-  model.findByIdAndRemove(ObjectId(req.params.customerId), (err, data) => {
+const deleteCustomerDetailByPK = (req, res) => {
+  Customer.findByIdAndRemove(ObjectId(req.params.customerId), (err, data) => {
     if (err) return err;
 
     if (!data) {
@@ -118,8 +178,13 @@ const deleteCustomerByPK = (req, res) => {
 };
 module.exports = {
   getAllCustomers,
-  getCustomerByPk,
   addCustomer,
+
+  getCustomerDetailByPk,
   updateCustomerDetailByPk,
-  deleteCustomerByPK,
+  deleteCustomerDetailByPK,
+
+  addCustomerAddressByPk,
+  getCustomerAddressByPk,
+  updateCustomerAddressByPk,
 };

@@ -19,6 +19,7 @@ const customerSchema = new mongoose.Schema({
   },
   address: [
     {
+      _id: false,
       country: {
         type: String,
         required: true,
@@ -26,6 +27,7 @@ const customerSchema = new mongoose.Schema({
       street1: {
         type: String,
         required: true,
+        unique: true,
       },
       street2: {
         type: String,
@@ -71,5 +73,4 @@ const Customer = mongoose.model('customer', customerSchema);
 
 module.exports = {
   Customer,
-  customerSchema,
 };

@@ -23,7 +23,7 @@ useDatabate().then((db) => {
   app.use('/api/product', createRouter.product);
   app.use('/api', (req, res) => res.json({ message: `api/`, github: 'github.com/naimhasim' }));
   app.use('*', (req, res) =>
-    res.status(404).json({ error: '404 Not Found!', redirect: 'http://localhost:8080/api/' })
+    res.status(404).json({ error: '404 Not Found!', redirect: `http://localhost:${port}/api/` })
   );
 
   app.listen(port, () => console.log(`Server running on http://localhost:${port}/api/`));

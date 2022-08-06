@@ -29,8 +29,7 @@ const getCustomerAddressByPk = (req, res) => {
     .then((data) => {
       if (!data) {
         res.json({ message: 'No address found.', success: true });
-      }
-      res.json({ ...{ data }, ...{ success: true } });
+      } else res.json({ ...{ data }, ...{ success: true } });
     });
 };
 
@@ -78,7 +77,7 @@ const updateCustomerAddressByPk = (req, res) => {
   temp = req.body.address;
 
   Customer.findOneAndUpdate(
-    { 'address.street1': temp.street1 },
+    { _id: customerId, 'address.street1': temp.street1 },
     { 'address.$.street2': temp.street2, 'address.$.city': temp.city }
   )
     .select('address')
@@ -101,21 +100,25 @@ const updateCustomerAddressByPk = (req, res) => {
 };
 
 const addCustomerAddressByPk = (req, res) => {
-  Customer.findByIdAndUpdate(req.params.customerId, {
-    $push: {
-      address: {
-        country: req.body.address.country,
-        street1: req.body.address.street1,
-        street2: req.body.address.street2,
-        city: req.body.address.city,
-        state: req.body.address.state,
-        zip: req.body.address.zip,
+  Customer.findOneAndUpdate(
+    { 'address.street1': { $ne: req.body.address.street1 } },
+    {
+      $push: {
+        address: {
+          country: req.body.address.country,
+          street1: req.body.address.street1,
+          street2: req.body.address.street2,
+          city: req.body.address.city,
+          state: req.body.address.state,
+          zip: req.body.address.zip,
+        },
       },
-    },
-  })
+    }
+  )
+    .select('address')
     .then((data) => {
       if (!data) {
-        res.json({ message: 'Address not created.', success: true });
+        res.json({ message: 'Address already taken! Please use another.', success: true });
       } else {
         res.json({ message: data, success: true });
       }
@@ -176,6 +179,30 @@ const deleteCustomerDetailByPK = (req, res) => {
       });
   });
 };
+
+const deleteCustomerAddressByPk = (req, res) => {
+  Customer.updateOne(
+    {
+      'address.street1': req.body.address.street1,
+    },
+    {
+      $pull: {
+        address: { street1: req.body.address.street1 },
+      },
+    }
+  )
+    .then((result) => {
+      console.log('console.log', result);
+
+      // https://mongoosejs.com/docs/api.html#model_Model-updateOne
+      !result.matchedCount >= 1 // number of documents matched
+        ? res.json({ message: 'Address not found.', success: true })
+        : res.json({ message: `Successfully deleted!`, success: true });
+    })
+    .catch((e) => {
+      res.json({ message: e, success: false });
+    });
+};
 module.exports = {
   getAllCustomers,
   addCustomer,
@@ -187,4 +214,5 @@ module.exports = {
   addCustomerAddressByPk,
   getCustomerAddressByPk,
   updateCustomerAddressByPk,
+  deleteCustomerAddressByPk,
 };

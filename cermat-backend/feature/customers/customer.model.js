@@ -71,6 +71,9 @@ const customerSchema = new mongoose.Schema({
 
 const Customer = mongoose.model('customer', customerSchema);
 
+Customer.on('index', () => {
+  console.log('Customers finished building indexes');
+});
 module.exports = {
   Customer,
 };

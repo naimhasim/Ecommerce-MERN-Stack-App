@@ -11,7 +11,8 @@ const customerController = require('../../feature/customers/customer.controller'
 router
   .post('/:customerId/address', customerController.addCustomerAddressByPk)
   .get('/:customerId/address', customerController.getCustomerAddressByPk)
-  .patch('/:customerId/address', customerController.updateCustomerAddressByPk);
+  .patch('/:customerId/address', customerController.updateCustomerAddressByPk)
+  .delete('/:customerId/address', customerController.deleteCustomerAddressByPk);
 
 router.get('/index', customerController.getAllCustomers).post('/', customerController.addCustomer);
 

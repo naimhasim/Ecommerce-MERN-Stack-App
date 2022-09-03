@@ -17,6 +17,7 @@ const Colors = {
   shaft: '*#333',
   dove_gray: '#d5d5d5',
   body_bg: '#f3f6f9',
+  light_blue: '#f0f6f7',
 
   ///
   // Solid Color
